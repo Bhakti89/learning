@@ -30,31 +30,52 @@ test('E2E basic regression – happy path', async ({ page }) => {
   // -----------------------------
 // Gender (auto-advances)
 // -----------------------------
-await page.getByText('Female', { exact: true }).click();
+// Gender selection (auto-advance screen)
+const femaleOption = page
+  .locator('.baseOptionQuestionStyles_optionContainer__kszJU')
+  .filter({ hasText: 'Female' });
+
+await expect(femaleOption).toBeVisible();
+await femaleOption.click();
+
+// Wait for next screen instead of Next button
 await expect(
-  page.getByRole('heading', {
-    name: 'Do you currently use products containing nicotine?',
-  })
+  page.getByText('Do you currently use products containing nicotine?')
 ).toBeVisible();
+
   // -----------------------------
 // Smoker
 // -----------------------------
 // Wait for the next step (Smoker question)
 await page.getByText('No', { exact: true }).click();
 
-// confirm navigation happened
+// confirm navigation happened → Health screen
 await expect(
   page.getByRole('heading', {
-    name: 'What is your overall health?',
+    name: 'How would you rate your health?',
   })
 ).toBeVisible();
 
+// -----------------------------
+// Health (auto-advances to Customize Quote)
+// -----------------------------
 
-  // -----------------------------
-  // Health
-  // -----------------------------
-  await page.locator('div').filter({ hasText: /^Excellent/ }).first().click();
-  await page.getByRole('button', { name: 'Next' }).click();
+// Select health option
+await page.getByText('Excellent', { exact: true }).click();
+// -----------------------------
+// Health (auto-advances)
+// -----------------------------
+const excellentOption = page
+  .getByText('Excellent', { exact: true })
+  .locator('..');
+
+await expect(excellentOption).toBeVisible();
+await excellentOption.click();
+
+// Wait for Customize Your Quote page (paragraph, not heading)
+await expect(
+  page.getByText('Customize Your Quote', { exact: true })
+).toBeVisible();
 
   // -----------------------------
   // Coverage checkboxes
