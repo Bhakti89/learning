@@ -1,3 +1,16 @@
+console.log('RUNNING FILE:', __filename);
+
+import { page } from '@playwright/test';
+
+export async function waitForMui(page)
+{
+    const backdrop = page.locator('.MuiBackdrop-root');
+    if (await backdrop.count()) 
+    {
+        await backdrop.waitFor({ state: 'hidden' });
+    }
+}
+
 import { test, expect } from '@playwright/test';
 
 test('E2E basic regression – happy path', async ({ page }) => {
@@ -5,20 +18,21 @@ test('E2E basic regression – happy path', async ({ page }) => {
   // -----------------------------
   // Start application
   // -----------------------------
-  await page.goto('https://instabraindevelopment.instabrain-dev.io/');
+  await page.goto('https://instabraindevelopment.instabrainstage.io/');
 
   await page.locator('#hero-cta-select').selectOption('insta-term');
 
   // -----------------------------
   // State selection
   // -----------------------------
+  await waitForMui(page);
   await page.locator('div').filter({ hasText: /^Select your state$/ }).first().click();
   await page
     .locator('.stateQuestionStyles_stateItem__wXbDC')
     .filter({ hasText: /^California$/ })
     .click();
 
-  await page.locator('.MuiBackdrop-root').waitFor({ state: 'hidden' });
+  await waitForMui(page);
   await page.getByRole('button', { name: 'Next' }).click();
 
   // -----------------------------
@@ -94,11 +108,17 @@ await expect(
   // -----------------------------
   // Coverage basics
   // -----------------------------
-  await page.locator('#coverage-basics-container').getByText('$').click();
-  await page.getByRole('option', { name: '$925,000' }).click();
+  //await page.locator('#coverage-basics-container').getByText('$').click();
+  const coverageAmount = page.locator('#coverage-basics-container').getByRole('combobox').filter({ hasText: '$' });
+  await coverageAmount.click();
 
+  const listbox = page.getByRole('listbox');
+  await expect(listbox).toBeVisible();
+  await listbox.getByRole('option', {name: '250,000'}).click();
+
+  await page.locator('.MuiBackdrop-root').waitFor({ state: 'hidden' });
   await page.locator('#coverage-basics-container').getByText('Years').click();
-  await page.getByRole('option', { name: '30 Years' }).click();
+  await page.getByRole('option', { name: '10 Years' }).click();
 
   await page.getByRole('button', { name: 'Apply Now' }).click();
 

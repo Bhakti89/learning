@@ -18,4 +18,7 @@ test("Launch Chromium and open the webpage of the Playwright", async({page}) =>
     console.log('Practice.. Heading Verified');
     await expect(page.getByRole('heading', {name: 'Student Registration Form'})).toBeVisible();
     console.log('Student.. Heading Verified');
+    await page.waitForTimeout(5000);
+    await expect(page.getByRole('placeholder', {name: 'First Name'})).toBeVisible();
+    console.log('placeholder tested successfully');
 });
