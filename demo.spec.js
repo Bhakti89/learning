@@ -8,4 +8,4 @@ test('practice test', async({page}) =>
     await page.locator('h1.Subhead-heading.Subhead-heading--large');
     await expect(page.locator('h1.Subhead-heading.Subhead-heading--large')).toContainText('Stargazers');
     console.log('Expected Result');
-});
+}); 
